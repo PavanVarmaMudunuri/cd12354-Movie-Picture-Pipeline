@@ -9,3 +9,4 @@ This folder contains the verification screenshots and logs for the **Movie Pictu
 5. **[backend_cd_success.png](backend_cd_success.png)**: Backend Continuous Deployment pipeline passing (ECR push, Kustomize edit, and EKS rollout).
 6. **[terraform_init.png](terraform_init.png)**: Terraform initialization in workspace.
 7. **[terraform_apply_output.png](terraform_apply_output.png)**: Terraform apply output showing created ECR repositories, EKS cluster, and IAM user.
+8. **[frontend_app_running.png](frontend_app_running.png)**: Working frontend UI running at `localhost:3000` displaying the movie catalog from the backend API.
