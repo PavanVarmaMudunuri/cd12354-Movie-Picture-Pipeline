@@ -101,6 +101,7 @@ jobs:
           REACT_APP_MOVIE_API_URL: ${{ secrets.REACT_APP_MOVIE_API_URL || 'http://localhost:5000' }}
         run: |
           docker build \
+            --no-cache \
             --build-arg REACT_APP_MOVIE_API_URL="${REACT_APP_MOVIE_API_URL}" \
             --tag "${ECR_REGISTRY}/frontend:${IMAGE_TAG}" \
             --tag "${ECR_REGISTRY}/frontend:latest" \
@@ -138,6 +139,7 @@ jobs:
           cd starter/frontend/k8s
           kustomize edit set image frontend="${ECR_REGISTRY}/frontend:${IMAGE_TAG}"
           kustomize build | kubectl apply -f -
+          kubectl rollout restart deployment/frontend -n default
 
       - name: Verify deployment rollout
         run: |
