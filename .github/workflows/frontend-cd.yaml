@@ -145,5 +145,15 @@ jobs:
 
       - name: Show service status and endpoints
         run: |
+          echo "=== KUBERNETES SERVICES ==="
           kubectl get services -n default -o wide
+          echo "=== KUBERNETES PODS ==="
           kubectl get pods -n default -o wide
+          echo "=== FRONTEND SERVICE DETAILS ==="
+          kubectl describe svc frontend -n default
+          echo "=== BACKEND SERVICE DETAILS ==="
+          kubectl describe svc backend -n default
+          echo "=== AWS LOAD BALANCERS ==="
+          aws elb describe-load-balancers --region ${{ secrets.AWS_REGION || 'us-east-1' }} --query "LoadBalancerDescriptions[*].[LoadBalancerName,DNSName]" --output table || true
+          echo "=== EC2 WORKER NODES PUBLIC IPS ==="
+          aws ec2 describe-instances --region ${{ secrets.AWS_REGION || 'us-east-1' }} --filters "Name=instance-state-name,Values=running" --query "Reservations[*].Instances[*].[InstanceId,PublicIpAddress,PublicDnsName]" --output table
