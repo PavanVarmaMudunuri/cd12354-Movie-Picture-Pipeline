@@ -10,4 +10,4 @@ This folder contains the verification screenshots and logs for the **Movie Pictu
 6. **[terraform_init.png](terraform_init.png)**: Terraform initialization in workspace.
 7. **[terraform_apply_output.png](terraform_apply_output.png)**: Terraform apply output showing created ECR repositories, EKS cluster, and IAM user.
 8. **[frontend_app_running.png](frontend_app_running.png)**: Working frontend UI running at `localhost:3000` displaying the movie catalog from the backend API.
-9. **[backend_api_running.png](backend_api_running.png)**: Working backend Flask API running at `http://localhost:5001/movies` returning movie catalog in JSON format.
+9. **[backend_api_running.png](backend_api_running.png)**: Working backend Flask API running and returning movie catalog in JSON format (target port 5000).
