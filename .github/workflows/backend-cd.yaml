@@ -138,3 +138,5 @@ jobs:
         run: |
           kubectl get services -n default -o wide
           kubectl get pods -n default -o wide
+          kubectl describe svc backend -n default
+          kubectl describe svc frontend -n default
