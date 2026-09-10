@@ -145,21 +145,5 @@ jobs:
 
       - name: Show service status and endpoints
         run: |
-          echo "Refreshing Kubernetes services..."
-          kubectl delete svc backend frontend --ignore-not-found=true
-          cd starter/backend/k8s && kustomize build | kubectl apply -f -
-          cd ../../frontend/k8s && kustomize build | kubectl apply -f -
-          echo "Waiting for AWS to allocate LoadBalancer hostnames..."
-          for i in {1..12}; do
-            BACKEND_HOST=$(kubectl get svc backend -n default -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-            FRONTEND_HOST=$(kubectl get svc frontend -n default -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-            if [ -n "$BACKEND_HOST" ] && [ -n "$FRONTEND_HOST" ]; then
-              echo "Backend URL: http://$BACKEND_HOST"
-              echo "Frontend URL: http://$FRONTEND_HOST"
-              break
-            fi
-            echo "Still waiting for LoadBalancers... ($i/12)"
-            sleep 10
-          done
           kubectl get services -n default -o wide
           kubectl get pods -n default -o wide
