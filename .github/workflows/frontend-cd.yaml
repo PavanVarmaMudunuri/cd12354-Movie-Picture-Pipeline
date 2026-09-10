@@ -121,6 +121,15 @@ jobs:
         run: |
           aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME || 'cluster' }} --region ${{ secrets.AWS_REGION || 'us-east-1' }}
 
+      - name: Tag VPC subnets for AWS Load Balancer
+        run: |
+          VPC_ID=$(aws eks describe-cluster --name ${{ secrets.EKS_CLUSTER_NAME || 'cluster' }} --region ${{ secrets.AWS_REGION || 'us-east-1' }} --query 'cluster.resourcesVpcConfig.vpcId' --output text)
+          SUBNETS=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=${VPC_ID}" --region ${{ secrets.AWS_REGION || 'us-east-1' }} --query 'Subnets[*].SubnetId' --output text)
+          echo "Tagging subnets in VPC ${VPC_ID}: ${SUBNETS}"
+          for s in ${SUBNETS}; do
+            aws ec2 create-tags --resources "${s}" --tags Key=kubernetes.io/role/elb,Value=1 Key=kubernetes.io/cluster/${{ secrets.EKS_CLUSTER_NAME || 'cluster' }},Value=shared --region ${{ secrets.AWS_REGION || 'us-east-1' }}
+          done
+
       - name: Deploy to Kubernetes
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -136,5 +145,15 @@ jobs:
 
       - name: Show service status and endpoints
         run: |
+          echo "Waiting for AWS to allocate LoadBalancer hostnames..."
+          for i in {1..12}; do
+            FRONTEND_HOST=$(kubectl get svc frontend -n default -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            if [ -n "$FRONTEND_HOST" ]; then
+              echo "Frontend URL: http://$FRONTEND_HOST"
+              break
+            fi
+            echo "Still waiting for LoadBalancers... ($i/12)"
+            sleep 10
+          done
           kubectl get services -n default -o wide
           kubectl get pods -n default -o wide
